@@ -1,0 +1,93 @@
+---
+title: 'Coursera: Data Science: Exploratory Data Analysis: Project 1'
+author: "John W. Tiede"
+date: "09/03/2014"
+output: pdf_document
+---
+
+# Introduction
+
+This assignment uses data from the UC Irvine Machine Learning Repository, a popular repository for machine learning datasets. In particular, we will be using the “Individual household electric power consumption Data Set” which I have made available on the course web site:
+
+```
+    Dataset: Electric power consumption [20Mb]
+
+    Description: Measurements of electric power consumption in one household with a one-minute 
+    sampling rate over a period of almost 4 years. Different electrical quantities and some 
+    sub-metering values are available.
+```
+
+The following descriptions of the 9 variables in the dataset are taken from the UCI web site:
+
+1. Date: Date in format dd/mm/yyyy
+2. Time: time in format hh:mm:ss
+3. Global_active_power: household global minute-averaged active power (in kilowatt)
+4. Global_reactive_power: household global minute-averaged reactive power (in kilowatt)
+5. Voltage: minute-averaged voltage (in volt)
+6. Global_intensity: household global minute-averaged current intensity (in ampere)
+7. Sub_metering_1: energy sub-metering No. 1 (in watt-hour of active energy). It corresponds to the kitchen, containing mainly a dishwasher, an oven and a microwave (hot plates are not electric but gas powered).
+8. Sub_metering_2: energy sub-metering No. 2 (in watt-hour of active energy). It corresponds to the laundry room, containing a washing-machine, a tumble-drier, a refrigerator and a light.
+9. Sub_metering_3: energy sub-metering No. 3 (in watt-hour of active energy). It corresponds to an electric water-heater and an air-conditioner.
+
+## Loading the data
+
+```{r, echo=FALSE}
+# Setup commands for this R-session:
+# Code to set working directory (enabled):
+if (TRUE) {
+    working.directory <- paste0(Sys.getenv("HOME"), "/School/Coursera/DataScience_JohnsHopkins/04_ExploratoryDataAnalysis/Project")
+    setwd(working.directory)
+    #getwd()
+}
+```
+
+When loading the dataset into R, please consider the following:
+
+The dataset has 2,075,259 rows and 9 columns. First calculate a rough estimate of how much memory the dataset will require in memory before reading into R. Make sure your computer has enough memory (most modern computers should be fine).
+
+```{r, echo=FALSE}
+data.cols       <- 9
+data.rows       <- 2075259
+numeric.bytes   <- 8        # 8 bytes/numeric (worst case?)
+sys.bytes       <- 2^20     # bytes/MBi
+sys.RAM         <- 4 * 1024 # MBi (4GBi of RAM)
+sys.word        <- 64       # bits/word
+
+data.memory <- data.rows * data.cols * numeric.bytes / sys.bytes
+printf("System RAM                  : %7.2f MBi", sys.RAM)
+printf("Data Set Memory Requirements: %7.2f MBi", data.memory)
+```
+
+We will only be using data from the dates 2007-02-01 and 2007-02-02. One alternative is to read the data from just those dates rather than reading in the entire dataset and subsetting to those dates.
+
+*Looking at the data file, there is a single header line, and the data is separated by the ';' character.*
+
+You may find it useful to convert the Date and Time variables to Date/Time classes in R using the strptime() and as.Date() functions.
+
+Note that in this dataset missing values are coded as ?.
+
+```{r}
+# Referenece: http://stackoverflow.com/questions/5595512/what-is-the-difference-between-require-and-library
+suppressPackageStartupMessages(library(xts))
+
+# Read in data:
+filename <- "household_power_consumption.txt"
+#some.data <- read.table(file=filename, header=TRUE, sep=";", stringsAsFactor=FALSE, na.strings="?", nrows=10)
+#data.classes <- sapply(some.data, class)
+#all.data <- read.table(file=filename, header=TRUE, sep=";", stringsAsFactor=FALSE, na.strings="?", colClasses=data.classes)
+all.data <- read.table(file=filename, header=TRUE, sep=";", stringsAsFactor=FALSE, na.strings="?")
+#dim(all.data)
+
+# Create 'zoo' object:
+timestamps <- as.POSIXct(paste(all.data$Date, all.data$Time), format="%d/%m/%Y %H:%M:%OS")
+HPC <- xts(all.data[, 3:9], timestamps)
+#class(HPC)
+#colnames(HPC)
+#head(HPC)
+
+# Subset for the days '2007-02-01' & '2007-02-02':
+HPC.sub <- HPC["2007-02-01::2007-02-02"]
+#dim(HPC.sub)
+#head(HPC.sub)
+```
+
