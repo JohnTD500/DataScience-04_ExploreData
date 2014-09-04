@@ -1,0 +1,125 @@
+https://github.com/JohnTD500/DataScience-04_ExploreData
+
+JohnTD500/DataScience-04_ExploreData
+
+Create a new repository on the command line
+
+touch README.md
+ninja{jwt}% git init
+ninja{jwt}% git add README.md
+ninja{jwt}% git commit -m "first commit"
+ninja{jwt}% git remote add origin https://github.com/JohnTD500/DataScience-04_ExploreData.git
+ninja{jwt}% git push -u origin master
+
+ninja{jwt}% git add Assignment01_Codebook.txt Assignment01.pdf Assignment02.pdf Project01.pdf Project01.Rmd
+ninja{jwt}% git commit -m "first commit"
+[master f6b63b4] first commit
+ 5 files changed, 125 insertions(+)
+ create mode 100644 Assignment01.pdf
+ create mode 100644 Assignment01_Codebook.txt
+ create mode 100644 Assignment02.pdf
+ create mode 100644 Project01.Rmd
+ create mode 100644 Project01.pdf
+
+ninja{jwt}% git push
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+When push.default is set to 'matching', git will push local branches
+to the remote branches that already exist with the same name.
+
+In Git 2.0, Git will default to the more conservative 'simple'
+behavior, which only pushes the current branch to the corresponding
+remote branch that 'git pull' uses to update the current branch.
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+Username for 'https://github.com': JohnTD500
+Password for 'https://JohnTD500@github.com': 
+Counting objects: 8, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (7/7), 451.67 KiB | 0 bytes/s, done.
+Total 7 (delta 0), reused 0 (delta 0)
+To https://github.com/JohnTD500/DataScience-04_ExploreData.git
+   75fbf17..f6b63b4  master -> master
+
+ninja{jwt}% git add figure/unnamed-chunk-2.png figure/unnamed-chunk-3.png figure/unnamed-chunk-4.png figure/unnamed-chunk-5.png
+ninja{jwt}% git commit -m "first commit"
+
+ninja{jwt}% git status
+On branch master
+Your branch is up-to-date with 'origin/master'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   README.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        .#gitreadme.txt
+        .RData
+        .Rhistory
+        Source_Classification_Code.rds
+        exdata_data_NEI_data.zip
+        exdata_data_household_power_consumption.zip
+        gitreadme.txt
+        gitreadme.txt~
+        household_power_consumption.txt
+        summarySCC_PM25.rds
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+
+
+
+ninja{jwt}% git info
+
+## Remote URLs:
+
+origin  https://github.com/JohnTD500/DataScience-04_ExploreData.git (fetch)
+origin  https://github.com/JohnTD500/DataScience-04_ExploreData.git (push)
+
+## Remote Branches:
+
+  origin/master
+
+## Local Branches:
+
+* master
+
+## Most Recent Commit:
+
+commit 2218934ea5f1de691a27e598f8c0cbaff731c7c7
+Author: John Tiede <j.tiede@comcast.net>
+
+    first commit
+
+Type 'git log' for more commits, or 'git show <commit id>' for full commit details.
+
+## Configuration (.git/config):
+
+user.name=John Tiede
+user.email=j.tiede@comcast.net
+color.ui=true
+core.editor=emacs
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.origin.url=https://github.com/JohnTD500/DataScience-04_ExploreData.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.master.remote=origin
+branch.master.merge=refs/heads/master
