@@ -38,7 +38,7 @@ PM2.5 Emissions Data (summarySCC_PM25.rds): This file contains a data frame with
 * type: The type of source (point, non-point, on-road, or non-road)
 * year: The year of emissions recorded
 
-Source Classification Code Table (Source_Classification_Code.rds): This table provides a mapping from the SCC digit strings int he Emissions table to the actual name of the PM2.5 source. The sources are categorized in a few different ways from more general to more specific and you may choose to explore whatever categories you think are most useful. For example, source “10100101” is known as “Ext Comb /Electric Gen /Anthracite Coal /Pulverized Coal”.
+Source Classification Code Table (Source_Classification_Code.rds): This table provides a mapping from the SCC digit strings in the Emissions table to the actual name of the PM2.5 source. The sources are categorized in a few different ways from more general to more specific and you may choose to explore whatever categories you think are most useful. For example, source “10100101” is known as “Ext Comb /Electric Gen /Anthracite Coal /Pulverized Coal”.
 
 You can read each of the two files using the readRDS() function in R. For example, reading in each file can be done with the following code:
 
@@ -54,58 +54,295 @@ as long as each of those files is in your current working directory (check by ca
 # Setup commands for this R-session:
 # Code to set working directory (enabled):
 if (TRUE) {
-    working.directory <- paste0(Sys.getenv("HOME"), 
-                                "/School/Coursera/DataScience_JohnsHopkins/04_ExploratoryDataAnalysis/Project")
-    setwd(working.directory)
-    #getwd()
+  working.directory <- paste0(Sys.getenv("HOME"), 
+      "/School/Coursera/DataScience_JohnsHopkins/04_ExploratoryDataAnalysis/Project")
+  setwd(working.directory)
+  #getwd()
 }
 ```
 
-```{r}
+```{r, echo=FALSE}
+# Variable name key:
+#   esrcs.<extension> == "emission sources" "dot" "purpose of variable"
+#   edata.<extension> == "emission data" "dot" "purpose of variable"
 
+# Read in data:
+esrcs.file <- paste0(working.directory, "/", "Source_Classification_Code.rds")
+edata.file <- paste0(working.directory, "/", "summarySCC_PM25.rds")
+
+if (file.exists(esrcs.file)) {
+  cat("Reading emission sources file")
+  esrcs <- readRDS("./Source_Classification_Code.rds")
+} else {
+  stop(paste("Emission sources file missing:", file.esrcs))
+}
+
+if (file.exists(edata.file)) {
+  cat("Reading emission data file")
+  edata <- readRDS("./summarySCC_PM25.rds")
+} else {
+  stop(paste("Emission data file missing:", file.edata))
+}
+
+# First, look at the data:
+#class(esrcs)
+#dim(esrcs)
+#colnames(esrcs)
+#head(esrcs)
+#tail(esrcs)
+#str(esrcs)
+#summary(esrcs)
+
+#class(edata)
+#dim(edata)
+#colnames(edata)
+#head(edata)
+#tail(edata)
+#str(edata)
+#summary(edata)
 ```
+
+```{r, echo=FALSE}
+# Calculate memory used with this data:
+esrcs.dim <- dim(esrcs)
+edata.dim <- dim(edata)
+numeric.bytes   <- 8        # 8 bytes/numeric (worst case?)
+sys.bytes       <- 2^20     # bytes/MBi
+sys.RAM         <- 4 * 1024 # MBi (4GBi of RAM)
+sys.word        <- 64       # bits/word
+
+esrcs.memory <- esrcs.dim[1] * esrcs.dim[2] * numeric.bytes / sys.bytes
+edata.memory <- edata.dim[1] * edata.dim[2] * numeric.bytes / sys.bytes
+
+printf("System RAM                          : %7.2f MBi", sys.RAM)
+printf("Emission Sources Memory Requirements: %7.2f MBi", esrcs.memory)
+printf("Emission Data Memory Requirements:    %7.2f MBi", edata.memory)
+```
+
 
 # Assignment
 
 The overall goal of this assignment is to explore the National Emissions Inventory database and see what it say about fine particulate matter pollution in the United states over the 10-year period 1999–2008. You may use any R package you want to support your analysis.
-Questions
+
+# Questions
 
 You must address the following questions and tasks in your exploratory analysis. For each question/task you will need to make a single plot. Unless specified, you can use any plotting system in R to make your plot.
 
-1. Have total emissions from PM2.5 decreased in the United States from 1999 to 2008? Using the base plotting system, make a plot showing the total PM2.5 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
+1. Have total emissions from PM2.5 decreased in the **United States** from 1999 to 2008? Using the base plotting system, make a plot showing the total PM2.5 emission from *all sources* for each of the years 1999, 2002, 2005, and 2008.
 
 ```{r}
-
+# If conditional is TRUE, plot graph to window system, else plot to file:
+if (TRUE) {
+  # Create the graph in the 'base' package:
+  boxplot(log10(Emissions) ~ year, dat=edata,
+          main="PM2.5 Emissions:All Sources:United States",
+          xlab="Year", ylab="log10(Tons of Particles)")
+} else {
+  # Create the 'png' file:
+  png(filename=paste0(working.directory, "/", "Question01.png"))
+  boxplot(log10(Emissions) ~ year, dat=edata,
+          main="PM2.5 Emissions:All Sources:United States",
+          xlab="Year", ylab="log10(Tons of Particles)")
+  dev.off()
+}
 ```
 
 2. Have total emissions from PM2.5 decreased in the **Baltimore City**, Maryland (fips == "24510") from 1999 to 2008? Use the base plotting system to make a plot answering this question.
 
 ```{r}
+# Subset edata for Baltimore City, Maryland:
+edata.24510 <- edata[edata$fips == "24510", ]
+# Make "fips" column values to be factors.
+# Make "type" column values to be factors.
+# Make "year" column values to be factors.
+edata.24510$fips <- as.factor(edata.24510$fips)
+edata.24510$type <- as.factor(edata.24510$type)
+edata.24510$year <- as.factor(edata.24510$year)
+#str(edata.24510)
 
+# If conditional is TRUE, plot graph to window system, else plot to file:
+if (TRUE) {
+  # Create the graph in the 'base' package:
+  boxplot(log10(Emissions) ~ year, dat=edata.24510,
+          main="PM2.5 Emissions:All Sources:Baltimore City, MD",
+          xlab="Year", ylab="log10(Tons of Particles)")
+} else {
+  # Create the 'png' file:
+  png(filename=paste0(working.directory, "/", "Question02.png"))
+  boxplot(log10(Emissions) ~ year, dat=edata.24510,
+          main="PM2.5 Emissions:All Sources:Baltimore City, MD",
+          xlab="Year", ylab="log10(Tons of Particles)")
+  dev.off()
+}
 ```
 
 3. Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for **Baltimore City**? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
 
 ```{r}
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(plyr))
+suppressPackageStartupMessages(library(reshape2))
 
+# Because we are using "ggplot2", make data long & tidy (one observation per row):
+edata.24510.melt <- edata.24510[, c("fips", "SCC", "year", "type", "Emissions")]
+edata.24510.melt <- melt(edata.24510, measure.vars="Emissions")
+
+# If conditional is TRUE, plot graph to window system, else plot to file:
+if (TRUE) {
+  q3.plot <- ggplot(edata.24510.melt, aes(x=year, y=log10(value), group=year))
+  q3.plot <- q3.plot + geom_boxplot()
+  q3.plot <- q3.plot + facet_wrap(~ type)
+  q3.plot <- q3.plot + ggtitle("PM2.5 Emissions:All Sources:Baltimore City, MD\nby Source Type")
+  q3.plot <- q3.plot + ylab("log10(Tons of Particles)")
+  q3.plot
+} else {
+  # Create the 'png' file:
+  png(filename=paste0(working.directory, "/", "Question03.png"))
+  q3.plot <- ggplot(edata.24510.melt, aes(x=year, y=log10(value), group=year))
+  q3.plot <- q3.plot + geom_boxplot()
+  q3.plot <- q3.plot + facet_wrap(~ type)
+  q3.plot <- q3.plot + ggtitle("PM2.5 Emissions:All Sources:Baltimore City, MD\nby Source Type")
+  q3.plot <- q3.plot + ylab("log10(Tons of Particles)")
+  q3.plot
+  dev.off()
+}
 ```
 
-4. Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
+4. Across the **United States**, how have emissions from coal combustion-related sources changed from 1999–2008?
 
 ```{r}
+# Subset Emission Sources to get "coal" Source Classification Codes (SCC):
+esrcs.coal <- as.character(esrcs$SCC[grepl("coal$", as.character(esrcs$SCC.Level.Three), ignore.case=TRUE)])
+#class(esrcs.coal)
+#length(esrcs.coal)
 
+# Subset Emission Data to get only coal sources:
+# Reference:
+#   http://stackoverflow.com/questions/15227887/how-can-i-subset-rows-in-a-data-frame-in-r-based-on-a-vector-of-values
+edata.coal <- edata[edata$SCC %in% esrcs.coal, c("fips", "year", "type", "Emissions")]
+edata.coal.melt <- melt(edata.coal, measure.vars="Emissions")
+edata.coal.melt$fips <- as.factor(edata.coal.melt$fips)
+edata.coal.melt$type <- as.factor(edata.coal.melt$type)
+edata.coal.melt$year <- as.factor(edata.coal.melt$year)
+
+# Testing (to be removed):
+#dim(edata.coal)
+#summary(edata.coal)
+#summary(edata.coal[edata.coal$year == 1999, "Emissions"])
+#sum(edata.coal$year == 1999)
+#summary(edata.coal[edata.coal$year == 2002, "Emissions"])
+#sum(edata.coal$year == 2002)
+#boxplot(log10(edata.coal[edata.coal$year == 2002, "Emissions"]))
+#hist(edata.coal[edata.coal$year == 2002, "Emissions"], breaks=20)
+#plot(density(log10(edata.coal[edata.coal$year == 2002, "Emissions"])))
+#summary(edata.coal[edata.coal$year == 2005, "Emissions"])
+#sum(edata.coal$year == 2005)
+#summary(edata.coal[edata.coal$year == 2008, "Emissions"])
+#sum(edata.coal$year == 2008)
+
+# If conditional is TRUE, plot graph to window system, else plot to file:
+# Reference:
+#   http://stackoverflow.com/questions/21563864/ggplot2-overlay-density-plots-r
+#   http://stackoverflow.com/questions/12944357/overlay-10-density-plots-in-r-with-colour-proportional-to-number-of-overlapping
+if (TRUE) {
+  # Create the graph in the 'ggplot2' package:
+  q4.plot <- ggplot(edata.coal.melt, aes(x=log10(value), fill=year, group=year))
+  q4.plot <- q4.plot + geom_density(alpha=0.20)
+  q4.plot <- q4.plot + ggtitle("PM2.5 Emissions:Coal Combustion Sources:United States\nDensity of Observations")
+  q4.plot <- q4.plot + xlab("log10(Tons of Particles)")
+  q4.plot
+} else {
+  # Create the 'png' file:
+  png(filename=paste0(working.directory, "/", "Question04.png"))
+  q4.plot <- ggplot(edata.coal.melt, aes(x=log10(value), fill=year, group=year))
+  q4.plot <- q4.plot + geom_density(alpha=0.20)
+  q4.plot <- q4.plot + ggtitle("PM2.5 Emissions:Coal Combustion Sources:United States\nDensity of Observations")
+  q4.plot <- q4.plot + xlab("log10(Tons of Particles)")
+  q4.plot
+  dev.off()
+}
 ```
 
-5. How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City? 
+5. How have emissions from motor vehicle sources changed from 1999–2008 in **Baltimore City**? 
 
 ```{r}
+# Subset Emission Sources to get "motor vehicle" Source Classification Codes (SCC):
+esrcs.mv <- as.character(esrcs$SCC[grepl(".*Mobile - On-Road.*", 
+                                         as.character(esrcs$EI.Sector), 
+                                         ignore.case=TRUE, perl=TRUE)])
 
+# Subset Emission Data to get only motor vehicles & Baltimore City sources:
+edata.24510.mv <- edata.24510[edata.24510$SCC %in% esrcs.mv, c("fips", "SCC", "year", "type", "Emissions")]
+#summary(edata.24510.mv[edata.24510.mv$year == 1999, "Emissions"])
+#summary(edata.24510.mv[edata.24510.mv$year == 2002, "Emissions"])
+#summary(edata.24510.mv[edata.24510.mv$year == 2005, "Emissions"])
+#summary(edata.24510.mv[edata.24510.mv$year == 2008, "Emissions"])
+edata.24510.mv.melt <- melt(edata.24510.mv, measure.vars="Emissions")
+
+# If conditional is TRUE, plot graph to window system, else plot to file:
+if (TRUE) {
+  # Create the graph in the 'ggplot2' package:
+  q5.plot <- ggplot(edata.24510.mv.melt, aes(x=log10(value), fill=year, group=year))
+  q5.plot <- q5.plot + geom_density(alpha=0.20)
+  q5.plot <- q5.plot + ggtitle("PM2.5 Emissions:Motor Vehicles:Baltimore City, MD\nDensity of Observations")
+  q5.plot <- q5.plot + xlab("log10(Tons of Particles)")
+  q5.plot
+} else {
+  # Create the 'png' file:
+  png(filename=paste0(working.directory, "/", "Question05.png"))
+  q5.plot <- ggplot(edata.24510.mv.melt, aes(x=log10(value), fill=year, group=year))
+  q5.plot <- q5.plot + geom_density(alpha=0.25)
+  q5.plot <- q5.plot + ggtitle("PM2.5 Emissions:Motor Vehicles:Baltimore City, MD\nDensity of Observations")
+  q5.plot <- q5.plot + xlab("log10(Tons of Particles)")
+  q5.plot
+  dev.off()
+}
 ```
 
-6. Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
+6. Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in **Los Angeles County, California** (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
 
 ```{r}
+# Subset edata for Los Angeles County, California:
+edata.06037 <- edata[edata$fips == "06037", ]
+edata.06037$fips <- as.factor(edata.06037$fips)
+edata.06037$type <- as.factor(edata.06037$type)
+edata.06037$year <- as.factor(edata.06037$year)
+#unique(edata.06037$fips)
 
+# Subset Emission Data to get only motor vehicles & Los Angeles sources:
+edata.06037.mv <- edata.06037[edata.06037$SCC %in% esrcs.mv, c("fips", "SCC", "year", "type", "Emissions")]
+
+# Combine Los Angeles, CA with Baltimore City, MD in a data frame:
+edata.both.mv <- rbind(edata.24510.mv, edata.06037.mv)
+edata.both.mv.melt <- melt(edata.both.mv, measure.vars="Emissions")
+#unique(edata.both.mv.melt$fips)
+#summary(edata.both.mv.melt)
+
+# Incremental Testing (to be removed):
+ggplot(edata.both.mv, aes(x=log10(Emissions), group=year, fill=year)) + 
+  geom_histogram(alpha=0.20)
+ggplot(edata.both.mv, aes(x=log10(Emissions), group=year, fill=year)) + 
+  geom_histogram(alpha=0.20) +
+  facet_grid(year ~ .)
+ggplot(edata.both.mv, aes(x=log10(Emissions), group=year)) + 
+  geom_histogram(data=subset(edata.both.mv, fips == "24510", fill="red"), alpha=0.20) +
+  geom_histogram(data=subset(edata.both.mv, fips == "06037", fill="green"), alpha=0.20) +
+  facet_grid(year ~ .)
+
+# If conditional is TRUE, plot graph to window system, else plot to file:
+if (TRUE) {
+  # Create the graph in the 'ggplot2' package:
+  q6.plot <- ggplot(edata.both.mv.melt, aes(x=log10(value), fill=fips, group=fips))
+  q6.plot <- q6.plot + geom_histogram(alpha=0.25)
+  q6.plot <- q6.plot + facet_wrap(~)
+  q6.plot <- q6.plot + ggtitle("PM2.5 Emissions:Motor Vehicles\nBaltimore vs Los Angeles\n[log10(Tons of Particulates)]")
+  q6.plot <- q6.plot + xlab("log10(Tons of Particles)")
+  q6.plot
+} else {
+  # Create the 'png' file:
+  png(filename=paste0(working.directory, "/", "Question06.png"))
+  dev.off()
+}
 ```
 
 
